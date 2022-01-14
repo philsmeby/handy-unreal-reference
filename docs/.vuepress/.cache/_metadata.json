@@ -1,0 +1,31 @@
+{
+  "hash": "5b6a4536",
+  "browserHash": "672057be",
+  "optimized": {
+    "vue": {
+      "file": "/mnt/t/code/handy-unreal-reference/docs/.vuepress/.cache/vue.js",
+      "src": "/mnt/t/code/handy-unreal-reference/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js",
+      "needsInterop": false
+    },
+    "vue-router": {
+      "file": "/mnt/t/code/handy-unreal-reference/docs/.vuepress/.cache/vue-router.js",
+      "src": "/mnt/t/code/handy-unreal-reference/node_modules/vue-router/dist/vue-router.esm-bundler.js",
+      "needsInterop": false
+    },
+    "@vueuse/core": {
+      "file": "/mnt/t/code/handy-unreal-reference/docs/.vuepress/.cache/@vueuse_core.js",
+      "src": "/mnt/t/code/handy-unreal-reference/node_modules/@vueuse/core/index.mjs",
+      "needsInterop": false
+    },
+    "nprogress": {
+      "file": "/mnt/t/code/handy-unreal-reference/docs/.vuepress/.cache/nprogress.js",
+      "src": "/mnt/t/code/handy-unreal-reference/node_modules/nprogress/nprogress.js",
+      "needsInterop": true
+    },
+    "@vuepress/shared": {
+      "file": "/mnt/t/code/handy-unreal-reference/docs/.vuepress/.cache/@vuepress_shared.js",
+      "src": "/mnt/t/code/handy-unreal-reference/node_modules/@vuepress/shared/lib/esm/index.js",
+      "needsInterop": false
+    }
+  }
+}
