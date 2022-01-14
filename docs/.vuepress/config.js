@@ -3,6 +3,7 @@ module.exports = {
 	lang: 'en-US',
 	title: 'Handy Unreal Engine Reference Guide',
 	description: 'A quick reference guide for the Unreal Engine 4.  Short and to the point!',
+	base: '/handy-unreal-reference/',
 
 	// theme and its config
 	theme: '@vuepress/theme-default',
