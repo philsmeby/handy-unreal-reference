@@ -8,6 +8,22 @@ module.exports = {
 	// theme and its config
 	theme: '@vuepress/theme-default',
 	themeConfig: {
-		logo: 'https://vuejs.org/images/logo.png',
+		domain: 'https://philsmeby.github.io/handy-unreal-reference',
+		repo: 'philsmeby/handy-unreal-reference',
+		repoLabel: 'Follow this Repo',
+		editLinks: true,
+		editLinkText: 'Edit on GitHub',
+		logo: 'https://www.pngkey.com/png/full/275-2752575_ue4-logo-unreal-engine-logo-png.png',
 	},
+
+	// Plugins
+	plugins: [
+		[
+      'vuepress-plugin-git-log',
+      {
+        additionalArgs: '--no-merge',
+        onlyFirstAndLastCommit: true,
+      },
+    ],
+	],
 }

@@ -12,3 +12,11 @@ Emoji can be embedded as well.  See documentation [here](https://github.com/ikat
 VueJS Code blocks.  [Info Here](https://stackoverflow.com/questions/4611591/code-vs-pre-vs-samp-for-inline-and-block-code-snippets)
 
 Awesome VuePress [Here](https://github.com/vuepress/awesome-vuepress)
+
+## Plugins
+
+vuepress-plugin-git-log[https://vuepress-community.netlify.app/en/plugins/git-log/#installation]
+
+``` bash
+yarn add -D vuepress-plugin-git-log
+```
