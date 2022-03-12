@@ -148,3 +148,9 @@ In Unreal engine we need to create a new Blueprint, select SExplodingBarrel in t
 ![Create Blueprint](../../media/explodingbarrel_2_new_blueprint.png)
 
 ![Select SExplodingBarrel in All Classes](../../media/explodingbarrel_3_select_blueprint.png)
+
+### Configure Exploding Barrel in Unreal
+
+Here we can add the particle effect and the material to the barrel.
+
+![Configure Exploding Barrel](../../media/explodingbarrel_4_configure_blueprint.png)

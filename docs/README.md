@@ -6,14 +6,13 @@ This will also help reinforce the basics of Unreal Engine as I am learning.
 
 [[toc]]
 
-## Example Header
-<details><summary>See Code</summary>
-<p>
-This is an example of a collapsible section.  We can hide irrelevant information and keep the page clean.  Want to know more click the button.
-</p>
-</details>
+## Custom Components
 
-### SubHeader example
+### Actors
+
+Examples|Description
+---|---
+[Exploding Barrel](./Actors/ExplodingBarrel/README.md)|A barrel that explodes when it takes damage.
 
 ## Example Header 2
 
