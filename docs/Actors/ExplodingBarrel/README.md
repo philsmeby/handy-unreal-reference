@@ -37,7 +37,7 @@ URadialForceComponent* RadialForceComp;
 */
 
 UFUNCTION()
-OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 bool bExploded
 
@@ -115,6 +115,7 @@ ASExplosiveBarrel::ASExplosiveBarrel()
 	MeshComp->SetSimulatePhysics(true);
 	// Set Physics body to let radial component affect us (example of when we are standing close)
 	MeshComp->SetCollisionObjectType(ECC_PhysicsBody); // Physics Body is required for the radial force component to work
+	MeshComp->SetMobility(EComponentMobility::Movable); // Required for Impulse to work
 	RootComponent = MeshComp;
 }
 ```
