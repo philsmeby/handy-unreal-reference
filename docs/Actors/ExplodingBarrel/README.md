@@ -142,7 +142,7 @@ ASExplosiveBarrel::ASExplosiveBarrel()
 }
 ```
 
-## Create Blueprint from ASexplosiveBarrel C++ Class
+## Create Blueprint from ASExplosiveBarrel C++ Class
 
 In Unreal engine we need to create a new Blueprint, select SExplodingBarrel in the `All Classes` list.
 
