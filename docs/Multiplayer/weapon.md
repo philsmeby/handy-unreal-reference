@@ -111,3 +111,72 @@ void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ASCharacter, CurrentWeapon);
 }
 ```
+
+## Replicating the Weapon Fire
+
+Here we are not replicating variables, but we are replicating functions.
+
+`SWeapon.h`
+```c++
+protected:
+	// Game Code
+
+	// Add a function for the server to handle the weapon firing
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFire();
+```
+
+The server `UFUNCTION(Server, ...)` means that the action will not occur on the clients, but it will push it to the server.
+
+Reliable `UFUNCTION(..., Reliable, ...)` means that the action is guaranteed to get to the server.  Unreliable means its not guaranteed, and for gameplay critical actions we need to use `Reliable`.
+
+`SWeapon.cpp`
+```c++
+// Convention for server functions is to prefix function name with Server
+// They also require an underscore Implementation "_Implementation"
+void ASWeapon::ServerFire_Implemenation()
+{
+}
+
+// WithValidation requires a validation function to be added
+bool ASWeapon::ServerFire_Validate()
+{
+	// This is intended to be an anti-cheat check!
+	// It is a way to disconnect cheaters from the server
+}
+```
+
+### Update Fire Function to use Replicated property
+
+We need to execute the Fire function on the server.
+
+`SWeapon.cpp`
+```c++
+void ASWeapon::Fire()
+{
+	if (!HasAuthority())
+	{
+		ServerFire();
+		return;
+	}
+
+	// Game Code below
+}
+
+
+void ASWeapon::ServerFire_Implementation()
+{
+	Fire();
+}
+```
+
+This change allows you to see the clients shooting on the server, but you will still not see the shooting on the clients.
+
+Remove the `return;` statement from ASWeapon::Fire() function
+
+```c++
+	if (!HasAuthority())
+	{
+		ServerFire();
+	}
+```
