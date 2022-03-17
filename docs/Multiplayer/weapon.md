@@ -180,3 +180,195 @@ Remove the `return;` statement from ASWeapon::Fire() function
 		ServerFire();
 	}
 ```
+
+**NOTE:** Damage should only be applied on the server side.  We don't want the clients to be able to set damage.
+
+### Replication Weapon Trace between clients
+
+Make a new struct
+
+`SWeapon.h`
+```c++
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "SWeapon.h"
+
+class USkeletalMeshComponent;
+class UDamageType;
+class UparticleSystem;
+
+// New code here.  Make a struct to contain the information of a single line trace
+USTRUCT()
+struct FHitScanTrace
+{
+	GENERATED_BODY()
+
+public:
+
+	// To replicate an enum to a client we have to convert it to bytes
+	UPROPERTY()
+	TEnumAsByte<EPhysicalSurface> SurfaceType;
+
+	UPROPERTY()
+	FVector_NetQuantize TraceTo;
+};
+
+
+// SWeapon.h code below
+
+:protected
+
+// Replicated each time the OnRep_HitScanTrace function is called
+UPROPERTY(ReplicatedUsing=OnRep_HitScanTrace)
+FHitScanTrace HitScanTrace;
+
+UFUNCTION()
+void OnRep_HitScanTrace();
+```
+
+Create the OnRep_HitScanTrace function
+
+`SWeapon.cpp`
+```c++
+// New Include
+#include "Net/UnrealNetwork.h"
+
+void ASWeapon::OnRep_HitScanTrace()
+{
+	// Play weapon FX
+	PlayFireEffects(HitScanTrace.TraceTo);
+}
+
+// Add the function call to the fire function
+
+void ASWeapon::Fire()
+{
+	// Game code below
+
+	if (DebugWeaponDrawing > 0)
+	{
+		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+	}
+
+	PlayeFireEffects(TracerEndpoint);
+
+	// New Code here:
+	if (HasAuthority())
+	{
+		HitScanTrace.TraceTo = TracerEndpoint;
+	}
+}
+
+void ASWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate to everyone with Conditions because we dont need to send this to the owner
+	DOREPLIFETIME_CONDITION(ASWeapon, HitScanTrace, COND_SkipOwner);
+}
+```
+
+*NOTE:* Still don't see the the impact effect
+*NOTE2:* Multiple shots in the same location are not replicated because the server thinks the client already has the information
+
+### Finish Impact Replication
+
+Move the Impact particle effect into a function so we can call it from the server.
+
+`SWeapon.h`
+```c++
+:protected
+	void PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint);
+```
+
+`SWeapon.cpp`
+```c++
+
+// New Function code
+void ASWeapon::PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint)
+{
+	UParticleSystem* SelectedEffect = nullptr;
+	switch (SurfaceType)
+	{
+		case SURFACE_FLESHDEFAULT:
+		case SURFACE_FLESHVULNERABLE:
+			SelectedEffect = FleshImpactEffect;
+			break;
+		default:
+			SelectedEffect = DefaultImpactEffect;
+			break;
+	}
+
+	if (SelectedEffect)
+	{
+		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+		FVector ShotDirection = ImpactPoint - MuzzleLocation;
+		ShotDirection.Normalize();
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SelectedEffect, ImpactPoint, ShotDirection.Rotation());
+	}
+}
+```
+
+Swap the code out in the fire function to use the PlayImpactEffects function we just created.
+
+`SWeapon.cpp`
+```c++
+void ASWeapon::Fire()
+{
+	// Game code below
+
+	UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), this, DamageType);
+
+	// New code here:
+	PlayImpactEffects(SurfaceType, Hit.ImpactPoint);
+}
+
+// Add to the OnRep_HitScanTrace function
+void ASWeapon::OnRep_HitScanTrace()
+{
+	PlayFireEffects(HitScanTrace.TraceTo);
+	PlayFireEffects(HitscanTrace.SurfaceType, HitScanTrace.TraceTo);
+}
+```
+
+### Replicate Surface Type
+
+`SWeapon.cpp`
+```c++
+void ASWeapon::Fire()
+{
+	// Set the default surface type, overwrite it only if we hit something
+	FVector TracerEndPoint = TraceEnd;
+	// New code:
+	EPhysicalSurface SurfaceType = SurfaceType_Default;
+	// ... More game code below ...
+
+
+	// New Code here:
+	if (HasAuthority())
+	{
+		HitScanTrace.TraceTo = TracerEndpoint;
+		HitScanTrace.SurfaceType = SurfaceType;
+	}
+
+}
+```
+
+### Set Network Tick Rate
+
+Bypass Unreal's dynamic network tick rate.
+
+`SWeapon.cpp`
+```c++
+ASWeapon::ASWeapon()
+{
+ // Set at the bottom of the constructor
+ NetUpdateFrequency = 66.0f;     // 100.f is the default
+ MinNetUpdateFrequency = 33.0f;  // 2.0 is the default
+}
+```
+
+*NOTE:* Doublecheck the blueprint `Replication` settings for Net Update Frequency and Min Net Update Frequency, as that will show if the settings are properly applied to the weapon.
+
+**BP_Rifle**
